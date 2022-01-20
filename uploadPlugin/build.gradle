@@ -1,0 +1,53 @@
+plugins {
+    id 'groovy'
+    id 'maven'
+    id 'java-library'
+    id 'org.jetbrains.kotlin.jvm'          // 注意要应用Kotlin 插件
+}
+//此处的ext和'apply from: '../publish-mavencentral.gradle''顺序一定不能乱，必须是先定义ext，然后在apply from
+ext {
+    PUBLISH_ARTIFACT_ID = "uploadPlugin" //你的artifact_id，一般是module的名字
+    PUBLISH_VERSION = "1.0.0"  //发布版本号
+    PUBLISH_GROUP_ID = 'io.github.yangsk94'  //你的sonatype的group_id
+}
+apply from: '../publish-mavencentral.gradle'
+
+dependencies {
+
+    //gradle sdk
+    implementation gradleApi()
+    //groovy sdk
+    implementation localGroovy()
+
+    implementation "com.android.tools.build:gradle:$build_gradle_version"
+
+    implementation "com.squareup.okhttp3:okhttp:4.9.0"
+
+    implementation "net.glxn.qrgen:javase:2.0"
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/kotlin']
+            srcDirs = ['src/main/java']
+        }
+    }
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            //设置插件的GAV参数
+            pom.groupId = 'com.sk.plugin'
+            pom.artifactId = 'upload'
+            pom.version = '1.0.0'
+
+            //文件发布到下面目录
+            repository(url: uri('../plugin'))
+        }
+    }
+}
